@@ -18,30 +18,28 @@
 #include <unistd.h>
 #include "constants.h"
 
-
 using namespace std;
 
-class ProcessParser{
+class ProcessParser {
 private:
     std::ifstream stream;
-    public:
-    static string getCmd(string pid);
-    static vector<string> getPidList();
-    static std::string getVmSize(string pid);
-    static std::string getCpuPercent(string pid);
+public:
+    static std::string getCmd(std::string pid);
+    static std::vector<std::string> getPidList();
+    static std::string getVmSize(std::string pid);
+    static std::string getCpuPercent(std::string pid);
     static long int getSysUpTime();
-    static std::string getProcUpTime(string pid);
-    static string getProcUser(string pid);
-    static vector<string> getSysCpuPercent(string coreNumber = "");
+    static std::string getProcUpTime(std::string pid);
+    static std::string getProcUser(std::string pid);
+    static std::vector<std::string> getSysCpuPercent(std::string coreNumber = "");
     static float getSysRamPercent();
-    static string getSysKernelVersion();
-    static int getNumberOfCores();
+    static std::string getSysKernelVersion();
     static int getTotalThreads();
     static int getTotalNumberOfProcesses();
     static int getNumberOfRunningProcesses();
+    static int getNumberOfCores();
     static string getOSName();
     static std::string PrintCpuStats(std::vector<std::string> values1, std::vector<std::string>values2);
-    static bool isPidExisting(string pid);
 };
 
 // TODO: Define all of the above functions below:
@@ -87,12 +85,27 @@ string ProcessParser::getCpuPercent(string pid)
     float cutime = stof(values[15]);
     float cstime = stof(values[16]);
     float starttime = stof(values[21]);
-    float uptime = ProcessParser::getSysUpTime();
+    float upTime = ProcessParser::getSysUpTime();
     float freq = sysconf(_SC_CLK_TCK);
-    float total_time = utime + stime + cutime + cstime;
-    float seconds = uptime - (starttime/freq);
+    float total_time = upTime + stime + cutime + cstime;
+    float seconds = upTime - (starttime/freq);
     result = 100.0*((total_time/freq)/seconds);
     return to_string(result);
+}
+
+string ProcessParser::getProcUpTime(string pid)
+{
+    string line;
+    string value;
+    float result;
+    ifstream stream = Util::getStream((Path::basePath() + pid + "/" +  Path::statPath()));
+    getline(stream, line);
+    string str = line;
+    istringstream buf(str);
+    istream_iterator<string> beg(buf), end;
+    vector<string> values(beg, end); // done!
+    // Using sysconf to get clock ticks of the host machine
+    return to_string(float(stof(values[13])/sysconf(_SC_CLK_TCK)));
 }
 
 long int ProcessParser::getSysUpTime()
@@ -158,7 +171,7 @@ vector<string> ProcessParser::getPidList()
     return container;
 }
 
-//string ProcessParser::getCmd(string pid)
+string ProcessParser::getCmd(string pid)
 {
     string line;
     ifstream stream = Util::getStream((Path::basePath() + pid + Path::cmdPath()));
@@ -203,7 +216,8 @@ vector<string> ProcessParser::getSysCpuPercent(string coreNumber)
     return (vector<string>());
 }
 
-float get_sys_active_cpu_time(vector<string> values)
+// float get_sys_active_cpu_time(vector<string> values)
+float getSysActiveCpuTime(vector<string> values)
 {
     return (stof(values[S_USER]) +
             stof(values[S_NICE]) +
@@ -215,12 +229,13 @@ float get_sys_active_cpu_time(vector<string> values)
             stof(values[S_GUEST_NICE]));
 }
 
-float get_sys_idle_cpu_time(vector<string>values)
+// float get_sys_idle_cpu_time(vector<string>values)
+float getSysIdleCpuTime(vector<string>values)
 {
     return (stof(values[S_IDLE]) + stof(values[S_IOWAIT]));
 }
 
-string ProcessParser::printCpuStats(vector<string> values1, vector<string> values2)
+string ProcessParser::PrintCpuStats(vector<string> values1, vector<string> values2)
 {
 /*
 Because CPU stats can be calculated only if you take measures in two different time,
@@ -307,7 +322,6 @@ string ProcessParser::getOSName()
         }
     }
     return "";
-
 }
 
 int ProcessParser::getTotalThreads()
@@ -350,7 +364,7 @@ int ProcessParser::getTotalNumberOfProcesses()
     return result;
 }
 
-int ProcessParser::getNumberOfRunningProcesses()
+static int ProcessParser::getNumberOfRunningProcesses()
 {
     string line;
     int result = 0;
@@ -367,212 +381,3 @@ int ProcessParser::getNumberOfRunningProcesses()
     }
     return result;
 }
-
-class SysInfo {
-    private:
-        vector<string> lastCpuStats;
-        vector<string> currentCpuStats;
-        vector<string> coresStats;
-        vector<vector<string>> lastCpuCoresStats;
-        vector<vector<string>> currentCpuCoresStats;
-        string cpuPercent;
-        float memPercent;
-        string osName;
-        string kernelVer;
-        long upTime;
-        int totalProc;
-        int runningProc;
-        int threads;
-
-    public:
-        SysInfo() {
-            /*
-            Getting initial info about system
-            Initial data for individual cores is set
-            System data is set
-            */
-            this->getOtherCores(getNumberOfCores());
-            this->setLastCpuMeasures();
-            this->setAttributes();
-            this->osName = ProcessParser::getOsName();
-            this->kernelVer = ProcessParser::getSysKernelVersion();
-        }
-        void setAttributes();
-        void setLastCpuMeasures();
-        string getMemPercent() const;
-        long getUpTime() const;
-        string getThreads() const;
-        string getTotalProc() const;
-        string getRunningProc() const;
-        string getKernelVersion() const;
-        string getOsName() const;
-        string getCpuPercent() const;
-        void getOtherCores(int _size);
-        void setCpuCoresStats();
-        vector<string> getCoresStats() const;
-};
-
-// string SysInfo::getCpuPercent() const 
-// {
-//     return this->cpuPercent;
-// }
-
-// string SysInfo::getMemPercent() const 
-// {
-//     return to_string(this->memPercent);
-// }
-
-// long SysInfo::getUpTime() const 
-// {
-//     return this->upTime;
-// }
-
-// string SysInfo::getKernelVersion() const 
-// {
-//     return this->kernelVer;
-// }
-
-// string SysInfo::getTotalProc() const 
-// {
-//     return to_string(this->totalProc);
-// }
-
-// string SysInfo::getRunningProc() const 
-// {
-//     return to_string(this->runningProc);
-// }
-
-// string SysInfo::getThreads() const 
-// {
-//     return to_string(this->threads);
-// }
-
-// string SysInfo::getOsName() const 
-// {
-//     return this->osName;
-// }
-
-// void SysInfo::setLastCpuMeasures()
-// {
-//     this->lastCpuStats = ProcessParser::getSysCpuPercent();
-// }
-
-// void SysInfo::getOtherCores(int _size)
-// {
-//     //when number of cores is detected, vectors are modified to fit incoming data
-//     this->coresStats = vector<string>();
-//     this->coresStats.resize(_size);
-//     this->lastCpuCoresStats = vector<vector<string>>();
-//     this->lastCpuCoresStats.resize(_size);
-//     this->currentCpuCoresStats = vector<vector<string>>();
-//     this->currentCpuCoresStats.resize(_size);
-//     for (int i = 0; i < _size; i++) {
-//         this->lastCpuCoresStats[i] = ProcessParser::getSysCpuPercent(to_string(i));
-//     }
-// }
-
-// void SysInfo::setCpuCoresStats()
-// {
-//     // Getting data from files (previous data is required)
-//     for(int i = 0; i < this->currentCpuCoresStats.size(); i++) {
-//         this->currentCpuCoresStats[i] = ProcessParser::getSysCpuPercent(to_string(i));
-//     }
-//     for(int i = 0; i < this->currentCpuCoresStats.size(); i++) {
-//         // after acquirement of data we are calculating every core percentage of usage
-//         this->cores_stats[i] = ProcessParser::PrintCpuStats(this->lastCpuCoresStats[i],this->currentCpuCoresStats[i]);
-//     }
-//     this->lastCpuCoresStats = this->currentCpuCoresStats;
-// }
-
-// void SysInfo::setAttributes() 
-// {
-//     // getting parsed data
-//     this->memPercent = ProcessParser::getSysRamPercent();
-//     this->upTime = ProcessParser::getSysUpTime();
-//     this->totalProc = ProcessParser::getTotalNumberOfProcesses();
-//     this->runningProc = ProcessParser::getNumberOfRunningProcesses();
-//     this->threads = ProcessParser::getTotalThreads();
-//     this->currentCpuStats = ProcessParser::getSysCpuPercent();
-//     this->cpuPercent = ProcessParser::PrintCpuStats(this->lastCpuStats,this->currentCpuStats);
-//     this->lastCpuStats = this->currentCpuStats;
-//     this->setCpuCoresStats();
-// }
-
-// // Constructing string for every core data display
-// vector<string> SysInfo::getCoresStats() const
-// {
-//     vector<string> result = vector<string>();
-//     for (int i = 0; i < this->coresStats.size() ;i++) {
-//         string temp = ("cpu" + to_string(i) +": ");
-//         float check = stof(this->cores_stats[i]);
-//         if (!check || this->coresStats[i] == "nan") {
-//             return vector<string>();
-//         }
-//         temp += Util::getProgressBar(this->coresStats[i]);
-//         result.push_back(temp);
-//     }
-//     return result;
-// }
-
-// #include <string>
-// using std::string;
-
-// /*
-// Basic class for Process representation
-// It contains relevant attributes as shown below
-// */
-// class Process {
-//     private:
-//         string pid;
-//         string user;
-//         string cmd;
-//         string cpu;
-//         string mem;
-//         string upTime;
-
-//     public:
-//         Process(string pid)
-//         {
-//             this->pid = pid;
-//             this->user = ProcessParser::getProcUser(pid);
-//             this->mem = ProcessParser::getVmSize(pid);
-//             this->cmd = ProcessParser::getCmd(pid);
-//             this->up_time = ProcessParser::getProcUpTime(pid);
-//             this->cpu  = ProcessParser::getCpuPercent(pid);
-//         }
-//         void setPid(int pid);
-//         string getPid() const;
-//         string getUser() const;
-//         string getCmd() const;
-//         int getCpu() const;
-//         int getMem() const;
-//         string getUpTime() const;
-//         string getProcess();
-// };
-
-// void Process::setPid(int pid)
-// {
-//     this->pid = pid;
-// }
-// string Process::getPid() const 
-// {
-//     return this->pid;
-// }
-// string Process::getProcess()
-// {
-//     this->mem = ProcessParser::getVmSize(this->pid);
-//     this->up_time = ProcessParser::getProcUpTime(this->pid);
-//     this->cpu = ProcessParser::getCpuPercent(this->pid);
-
-//     return (this->pid + "   "
-//                     + this->user
-//                     + "   "
-//                     + this->mem.substr(0,5)
-//                     + "     "
-//                     + this->cpu.substr(0,5)
-//                     + "     "
-//                     + this->up_time.substr(0,5)
-//                     + "    "
-//                     + this->cmd.substr(0,30)
-//                     + "...");
-// }
