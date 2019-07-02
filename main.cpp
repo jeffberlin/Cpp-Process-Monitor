@@ -10,18 +10,18 @@
 #include "util.h"
 #include "SysInfo.h"
 #include "ProcessContainer.h"
+#include "ProcessParser.h"
+
 
 using namespace std;
 
-
-char* getCString(std::string str){
+char* getCString(std::string str) {
     char * cstr = new char [str.length()+1];
     std::strcpy (cstr, str.c_str());
     return cstr;
 }
 
-void writeSysInfoToConsole(SysInfo sys, WINDOW* sys_win)
-{
+void writeSysInfoToConsole(SysInfo sys, WINDOW* sys_win) {
     sys.setAttributes();
 
     mvwprintw(sys_win,2,2,getCString(( "OS: " + sys.getOSName())));
@@ -44,11 +44,9 @@ void writeSysInfoToConsole(SysInfo sys, WINDOW* sys_win)
     mvwprintw(sys_win,11,2,getCString(( "Total Processes:" + sys.getTotalProc())));
     mvwprintw(sys_win,12,2,getCString(( "Running Processes:" + sys.getRunningProc())));
     mvwprintw(sys_win,13,2,getCString(( "Up Time: " + Util::convertToTime(sys.getUpTime()))));
-
 }
 
-void getProcessListToConsole(ProcessContainer procs,WINDOW* win)
-{
+void getProcessListToConsole(ProcessContainer procs,WINDOW* win) {
     procs.refreshList();
     wattron(win,COLOR_PAIR(2));
     mvwprintw(win,1,2,"PID:");
@@ -65,8 +63,7 @@ void getProcessListToConsole(ProcessContainer procs,WINDOW* win)
     }
 }
 
-void printMain(SysInfo sys,ProcessContainer procs)
-{
+void printMain(SysInfo sys,ProcessContainer procs) {
     initscr(); // start curses mode
     noecho(); // not printing input values
     cbreak(); // Terminating on classic ctrl + c

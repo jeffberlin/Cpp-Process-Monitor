@@ -1,5 +1,5 @@
 #include <string>
-// using std::string;
+using std::string;
 using namespace std;
 
 /*
@@ -27,11 +27,11 @@ class Process {
         }
         void setPid(int pid);
         string getPid() const;
-        // string getUser() const;
-        // string getCmd() const;
-        // int getCpu() const;
-        // int getMem() const;
-        // string getUpTime() const;
+        string getUser() const;
+        string getCmd() const;
+        int getCpu() const;
+        int getMem() const;
+        string getUpTime() const;
         string getProcess();
 };
 

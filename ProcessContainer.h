@@ -6,8 +6,7 @@ using std::vector;
 
 class ProcessContainer {
     public:
-        ProcessContainer()
-        {
+        ProcessContainer() {
             this->refreshList();
         }
         void refreshList();
@@ -19,27 +18,16 @@ class ProcessContainer {
 
 };
 
-// void ProcessContainer::refreshList()
-// {
-//     vector<string> pids = ProcessParser::getPidList();
-//     this->_list.clear();
-//     for (auto pid : pids) {
-//         Process proc(pid);
-//         this->_list.push_back(proc);
-//     }
-// }
-
 void ProcessContainer::refreshList() {
-    vector<string> pidList = ProcessParser::getPidList();
+    vector<string> pids = ProcessParser::getPidList();
     this->_list.clear();
-    for (int i = 0; i < pidList.size(); i++) {
-        Process proc(pidList[i]);
+    for (auto pid : pids) {
+        Process proc(pid);
         this->_list.push_back(proc);
     }
 }
 
-string ProcessContainer::printList()
-{
+string ProcessContainer::printList() {
     std::string result="";
     for (auto i : _list) {
         result += i.getProcess();
@@ -47,8 +35,7 @@ string ProcessContainer::printList()
     return result;
 }
 
-vector<string> ProcessContainer::getList() 
-{
+vector<string> ProcessContainer::getList() {
     vector<string> values;
     for (int i = (this->_list.size()-10); i < this->_list.size(); i++){
         values.push_back(this->_list[i].getProcess());
