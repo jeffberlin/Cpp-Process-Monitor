@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -50,8 +51,8 @@ std::ifstream Util::getStream(std::string path) {
     return stream;
 }
 
-int main() {   
-    Util u;
-    std::cout << u.convertToTime(403909) << "\n";
-    std::cout << u.getProgressBar("99\n");
-}
+// int main() {
+//     Util u;
+//     std::cout << u.convertToTime(403909) << "\n";
+//     std::cout << u.getProgressBar("99\n");
+// }

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PATH_H
 #define PATH_H
 
@@ -19,7 +20,7 @@ enum CPUStates {
 
 class Path {
     public:
-        static string basePath() 
+        static string basePath()
         {
             return "/proc/";
         }

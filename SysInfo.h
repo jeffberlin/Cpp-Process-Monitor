@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <iostream>
 #include <vector>
@@ -47,46 +48,42 @@ public:
     std::vector<std::string> getCoresStats()const;
 };
 
-void SysInfo::setLastCpuMeasures(){
- this->lastCpuStats = ProcessParser::getSysCpuPercent();
-}
-
-string SysInfo::getCpuPercent() const 
+string SysInfo::getCpuPercent() const
 {
     return this->cpuPercent;
 }
 
-string SysInfo::getMemPercent() const 
+string SysInfo::getMemPercent() const
 {
     return to_string(this->memPercent);
 }
 
-long SysInfo::getUpTime() const 
+long SysInfo::getUpTime() const
 {
     return this->upTime;
 }
 
-string SysInfo::getKernelVersion() const 
+string SysInfo::getKernelVersion() const
 {
     return this->kernelVer;
 }
 
-string SysInfo::getTotalProc() const 
+string SysInfo::getTotalProc() const
 {
     return to_string(this->totalProc);
 }
 
-string SysInfo::getRunningProc() const 
+string SysInfo::getRunningProc() const
 {
     return to_string(this->runningProc);
 }
 
-string SysInfo::getThreads() const 
+string SysInfo::getThreads() const
 {
     return to_string(this->threads);
 }
 
-string SysInfo::getOSName() const 
+string SysInfo::getOSName() const
 {
     return this->OSname;
 }
@@ -123,7 +120,7 @@ void SysInfo::setCpuCoresStats()
     this->lastCpuCoresStats = this->currentCpuCoresStats;
 }
 
-void SysInfo::setAttributes() 
+void SysInfo::setAttributes()
 {
     // getting parsed data
     this->memPercent = ProcessParser::getSysRamPercent();

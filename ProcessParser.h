@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <iostream>
 #include <math.h>
@@ -17,7 +18,6 @@
 #include <time.h>
 #include <unistd.h>
 #include "constants.h"
-#include "ProcessContainer.h"
 
 using namespace std;
 
@@ -316,16 +316,17 @@ int ProcessParser::getTotalThreads() {
     string name = "Threads:";
     vector<string>_list = ProcessParser::getPidList();
     for (int i=0 ; i<_list.size();i++) {
-    string pid = _list[i];
-    //getting every process and reading their number of their threads
-    ifstream stream = Util::getStream((Path::basePath() + pid + Path::statusPath()));
-    while (std::getline(stream, line)) {
-        if (line.compare(0, name.size(), name) == 0) {
-            istringstream buf(line);
-            istream_iterator<string> beg(buf), end;
-            vector<string> values(beg, end);
-            result += stoi(values[1]);
-            break;
+        string pid = _list[i];
+        //getting every process and reading their number of their threads
+        ifstream stream = Util::getStream((Path::basePath() + pid + Path::statusPath()));
+        while (std::getline(stream, line)) {
+            if (line.compare(0, name.size(), name) == 0) {
+                istringstream buf(line);
+                istream_iterator<string> beg(buf), end;
+                vector<string> values(beg, end);
+                result += stoi(values[1]);
+                break;
+            }
         }
     }
     return result;
@@ -348,7 +349,7 @@ int ProcessParser::getTotalNumberOfProcesses() {
     return result;
 }
 
-static int ProcessParser::getNumberOfRunningProcesses() {
+int ProcessParser::getNumberOfRunningProcesses() {
     string line;
     int result = 0;
     string name = "procs_running";

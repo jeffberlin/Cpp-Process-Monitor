@@ -10,7 +10,6 @@
 #include "util.h"
 #include "SysInfo.h"
 #include "ProcessContainer.h"
-#include "ProcessParser.h"
 
 
 using namespace std;
@@ -67,7 +66,7 @@ void printMain(SysInfo sys,ProcessContainer procs) {
     initscr(); // start curses mode
     noecho(); // not printing input values
     cbreak(); // Terminating on classic ctrl + c
-    startColor(); // Enabling color change of text
+    start_color(); // Enabling color change of text
     int yMax,xMax;
     getmaxyx(stdscr,yMax,xMax); // getting size of window measured in lines and columns(column one char length)
     WINDOW *sys_win = newwin(17,xMax-1,0,0);
